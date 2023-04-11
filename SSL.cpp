@@ -106,11 +106,56 @@ UNLList::UNLList() : head(nullptr) { }
 
 // Funcion copy para CC y OAO
 
-// void UNLList:: copy (const UNLList& originallist) ;
+void UNLList::copy(const UNLList& original) {
+
+    if (original.head == nullptr) // Lista original
+        head = nullptr ;
+    else { // Lista original no esta vaciia
+    
+        // Generar y copiar el primer nodo de original
+        head = new Node(original.head->info) ;
+
+        // Necesito dos punteros
+        // 1. Other pointer apunta a los nodos de original
+        // 2. copyptr apunta a los nodos de la nueva lista
+
+            Nodeptr originalptr, copyptr ;
+
+            // Advice pointer of original list
+
+            originalptr = original.head-> link ;
+            copyptr = head ;
+            while(originalptr != nullptr) // No haya llegado
+            { // No haya llegado al final de original
+            
+                copyptr->link = new Node(originalptr->info) ;
+
+                // Adelantar ambos punteros
+
+                copyptr = copyptr->link ;
+                originalptr = originalptr->link ;
+
+            }   // End while
+    }    // End else
+}   // End copy function
 
 // Copy constructor
+UNLList::UNLList(const UNLList& original) {
 
-//  UNLList::UNLList(const UNLList& original) ;
+    copy(original) ;
+}
+
+// Definir el OAO
+/*const*/UNLList& UNLList::operator=(const UNLList& right) {
+    if (this != &right) // self assignment
+    {
+        if (!IsEmpty()) {
+            destroyList() ;
+            copy(right) ;
+        }
+    }
+    return *this ;
+}
 
 // Destruir la lista
 // Utilizar para clear y en el destructor
@@ -163,3 +208,56 @@ void UNLList::print() const {
         }
     }
 }
+
+// Buscar si un item esta en la lista
+bool UNLList::search(int item) const {
+    bool found = false ;
+
+    // Cotejar si la lista esta vacia
+    if(IsEmpty()) {
+        cout << "\tEmpty list, cannot search.\n" ;
+    }
+    else {  // La lista no esta vacia
+        // Traverse the list searching for item
+        cout << "\tThe elements in the list are:\n" ;
+        
+        Nodeptr current = head ; 
+        while (current != nullptr && !found) {
+            if(item == current->info)
+                found = true ;
+            else
+                // seguir buscando avanzar el puntero
+                current = current->link ;
+
+        } // End while
+    }   // End else
+    return found ;
+}  // end search 
+
+// Insertar in item (nodo) a la lista
+// Insertar al final de la lista (append)
+
+void UNLList::insert(int item) {
+    if(!IsEmpty() && search(item)) // Corto circuito
+        cout << item << " already in list, cannot insert.\n" ;
+    else {  // item no esta en la lista, pero la lista puede estar vacia
+        // Creamos un nodo
+
+        Nodeptr newNode = new Node(item) ;
+        if(IsEmpty())                       // Case i empty list
+            head = newNode ;
+        else{   // Case 2 list not empty
+        
+            // Search for list end
+            
+            Nodeptr current = head ;
+            while(current->link!= nullptr)
+                current = current->link ;
+
+            // Inserta node at the end
+
+            current->link = newNode ;
+        } //    End else  
+
+    }   // End else
+}   // End insert function
